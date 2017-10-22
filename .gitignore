@@ -1,0 +1,46 @@
+# NetBeans specific #
+nbproject/
+build/
+nbbuild/
+dist/
+nbdist/
+manifest.mf
+build.xml
+nbactions.xml
+nb-configuration.xml
+
+# Eclipse specific #
+/bin/
+.settings/
+.project
+.classpath
+
+# Idea Files #
+.idea/*
+*/.idea
+*.iws
+*.iml
+/out/
+.idea_modules/
+atlassian-ide-plugin.xml
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+
+# Class Files #
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
+!libs/*.jar
+.DS_Store
+/target/
+
+# Project specific files
+properties.ignore.txt
+
+#Don't ignore source files
+!src/*
