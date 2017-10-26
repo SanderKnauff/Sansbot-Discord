@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Properties;
 
+import nl.imine.discord.event.Event;
+import nl.imine.discord.event.EventDispatcher;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,12 +18,15 @@ public class Sansbot {
 	private static final Logger logger = LoggerFactory.getLogger(Sansbot.class);
 	public static Rest rest = null;
 
+	private static EventDispatcher eventDispatcher;
+
 	public static void main(String[] args) throws IOException {
 		Properties properties = loadProperties();
 		String botToken = properties.getProperty("discord.client.token");
+		eventDispatcher = new EventDispatcher();
 		rest = new Rest(botToken);
 		try {
-			new Gateway(rest).openWebSocket(botToken);
+			new Gateway(rest, eventDispatcher).openWebSocket(botToken);
 		} catch (URISyntaxException | ParseException e) {
 			e.printStackTrace();
 		} catch (Exception e) {

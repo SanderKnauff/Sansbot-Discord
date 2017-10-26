@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,10 +52,10 @@ public class Channel {
 	}
 
 	public void sendMessage(String message) {
-		Message content = new Message(message, null, false, null, null);
+		Message content = new Message(null, id, null, null, null, null, false, false, null, null, null, null, null, null, false, null, null);
 		try {
 			String url = String.format("https://discordapp.com/api/channels/%s/messages", id);
-			String data = content.toJSON().toJSONString();
+			String data = new ObjectMapper().writeValueAsString(content);
 			logger.info("Send message to url: {}. Content: {}", url, data);
 			HashMap<String, String> parameters = new HashMap<>();
 			parameters.put("Content-Type", "application/json");

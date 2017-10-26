@@ -1,15 +1,20 @@
 package nl.imine.discord.gateway;
 
+import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import nl.imine.discord.event.Event;
+import nl.imine.discord.event.EventDispatcher;
 import org.eclipse.jetty.websocket.api.Session;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.imine.discord.event.EventType;
+import nl.imine.discord.event.gateway.EventType;
 import nl.imine.discord.gateway.messages.EventMessage;
 import nl.imine.discord.gateway.messages.HelloMessage;
 import nl.imine.discord.gateway.messages.IdentifyMessage;
@@ -25,11 +30,13 @@ public class WebSocketMessageHandler {
 	private static ScheduledExecutorService executorService = Executors.newScheduledThreadPool(10);
 
 	private final Session session;
+	private final EventDispatcher eventDispatcher;
 	private HeartbeatTask heartbeatTask;
 	private String botToken;
 
-	public WebSocketMessageHandler(Session session, String botToken) {
+	public WebSocketMessageHandler(Session session, EventDispatcher eventDispatcher, String botToken) {
 		this.session = session;
+		this.eventDispatcher = eventDispatcher;
 		this.heartbeatTask = new HeartbeatTask(session);
 		this.botToken = botToken;
 	}
@@ -46,6 +53,15 @@ public class WebSocketMessageHandler {
 			switch (opcode) {
 				case EVENT:
 					EventMessage eventMessage = EventMessage.fromJSON(message);
+					try {
+						if(eventMessage.getEventType().getEventClass() != null) {
+							ObjectMapper objectMapper = new ObjectMapper();
+							objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+							eventDispatcher.callEvent((Event) objectMapper.readValue(message.toJSONString(), eventMessage.getEventType().getEventClass()));
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 					logger.info("EventMessage({}): {}", eventMessage.getEventType(), eventMessage.getEventData().toJSONString());
 
 					//TEMP

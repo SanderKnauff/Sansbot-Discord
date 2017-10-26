@@ -1,10 +1,11 @@
 package nl.imine.discord.gateway.messages;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.imine.discord.event.EventType;
+import nl.imine.discord.event.gateway.EventType;
 
 public class EventMessage extends WebSocketMessage {
 

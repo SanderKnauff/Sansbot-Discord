@@ -3,6 +3,7 @@ package nl.imine.discord.gateway;
 import java.net.URI;
 import java.util.HashMap;
 
+import nl.imine.discord.event.EventDispatcher;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
@@ -15,11 +16,13 @@ import nl.imine.discord.util.Rest;
 public class Gateway {
 
 	private static final Logger logger = LoggerFactory.getLogger(Gateway.class);
+	private final EventDispatcher eventDispatcher;
 
 	private Rest rest;
 
-	public Gateway(Rest rest) {
+	public Gateway(Rest rest, EventDispatcher eventDispatcher) {
 		this.rest = rest;
+		this.eventDispatcher = eventDispatcher;
 	}
 
 	public void openWebSocket(String botToken) throws Exception {
@@ -35,7 +38,7 @@ public class Gateway {
 		ClientUpgradeRequest request = new ClientUpgradeRequest();
 		request.setHeader("Authorization", "bot " + botToken);
 		webSocket.start();
-		GatewaySocket gatewaySocket = new GatewaySocket(botToken);
+		GatewaySocket gatewaySocket = new GatewaySocket(botToken, eventDispatcher);
 		webSocket.connect(gatewaySocket, new URI(url), request);
 
 		logger.info("WebSocket is connected: {}", gatewaySocket.isConnected());

@@ -2,6 +2,7 @@ package nl.imine.discord.gateway;
 
 import java.util.concurrent.CountDownLatch;
 
+import nl.imine.discord.event.EventDispatcher;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.json.simple.JSONObject;
@@ -15,13 +16,15 @@ public class GatewaySocket extends WebSocketAdapter {
 	private static Logger logger = LoggerFactory.getLogger(GatewaySocket.class);
 
 	private final CountDownLatch closeLatch;
+	private final EventDispatcher eventDispatcher;
 	private WebSocketMessageHandler webSocketMessageHandler;
 	private Session session;
 	private String botToken;
 
-	public GatewaySocket(String botToken) {
+	public GatewaySocket(String botToken, EventDispatcher eventDispatcher) {
 		this.closeLatch = new CountDownLatch(1);
 		this.botToken = botToken;
+		this.eventDispatcher = eventDispatcher;
 	}
 
 	@Override
@@ -35,7 +38,7 @@ public class GatewaySocket extends WebSocketAdapter {
 	public void onWebSocketConnect(Session session) {
 		logger.info("Connected: {}", session);
 		this.session = session;
-		this.webSocketMessageHandler = new WebSocketMessageHandler(session, botToken);
+		this.webSocketMessageHandler = new WebSocketMessageHandler(session, eventDispatcher, botToken);
 	}
 
 	@Override
