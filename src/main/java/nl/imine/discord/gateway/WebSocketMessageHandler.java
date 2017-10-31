@@ -63,29 +63,6 @@ public class WebSocketMessageHandler {
 						e.printStackTrace();
 					}
 					logger.info("EventMessage({}): {}", eventMessage.getEventType(), eventMessage.getEventData().toJSONString());
-
-					//TEMP
-					if(EventType.MESSAGE_CREATE.equals(eventMessage.getEventType())) {
-						if(eventMessage.getEventData().get("content").toString().equalsIgnoreCase("!WeVliegenErin")) {
-							new Channel(String.valueOf(eventMessage.getEventData().get("channel_id")),
-									null,
-									null,
-									0,
-									null,
-									null,
-									null,
-									false,
-									null,
-									0,
-									1,
-									null,
-									null,
-									null,
-									null,
-									null).sendMessage("PATAT!");
-						}
-					}
-					//END TEMP
 					break;
 				case HELLO:
 					HelloMessage helloMessage = HelloMessage.fromJSON((JSONObject) message.get("d"));

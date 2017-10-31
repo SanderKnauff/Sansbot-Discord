@@ -17,9 +17,6 @@ import nl.imine.discord.util.Rest;
 public class Sansbot {
 
 	private static final Logger logger = LoggerFactory.getLogger(Sansbot.class);
-	public static Rest rest = null;
-
-	private static EventDispatcher eventDispatcher;
 
 	public static void main(String[] args) throws IOException {
 		Properties properties = loadProperties();

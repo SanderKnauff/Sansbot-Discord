@@ -51,20 +51,6 @@ public class Channel {
 		this.parentId = parentId;
 	}
 
-	public void sendMessage(String message) {
-		Message content = new Message(null, id, null, null, null, null, false, false, null, null, null, null, null, null, false, null, null);
-		try {
-			String url = String.format("https://discordapp.com/api/channels/%s/messages", id);
-			String data = new ObjectMapper().writeValueAsString(content);
-			logger.info("Send message to url: {}. Content: {}", url, data);
-			HashMap<String, String> parameters = new HashMap<>();
-			parameters.put("Content-Type", "application/json");
-			Sansbot.rest.postSync(url, parameters, data);
-		} catch (IOException e) {
-			logger.warn("Failed to send message ({}: {})", e.getClass().getSimpleName(), e.getMessage());
-		}
-	}
-
 	public String getId() {
 		return id;
 	}
