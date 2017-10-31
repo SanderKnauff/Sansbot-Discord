@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.HashMap;
 
 import nl.imine.discord.event.EventDispatcher;
+import nl.imine.vaccine.annotation.Component;
+import nl.imine.vaccine.annotation.Property;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
@@ -13,19 +15,22 @@ import org.slf4j.LoggerFactory;
 
 import nl.imine.discord.util.Rest;
 
+@Component
 public class Gateway {
 
 	private static final Logger logger = LoggerFactory.getLogger(Gateway.class);
+
 	private final EventDispatcher eventDispatcher;
+	private final Rest rest;
+	private final String botToken;
 
-	private Rest rest;
-
-	public Gateway(Rest rest, EventDispatcher eventDispatcher) {
+	public Gateway(@Property("discord.client.token") String botToken, Rest rest, EventDispatcher eventDispatcher) {
 		this.rest = rest;
+		this.botToken = botToken;
 		this.eventDispatcher = eventDispatcher;
 	}
 
-	public void openWebSocket(String botToken) throws Exception {
+	public void openWebSocket() throws Exception {
 		JSONObject ret = rest.getSync("https://discordapp.com/api/gateway", new HashMap<>());
 		String url = (String) ret.get("url") + "/?v=6&encoding=json";
 		logger.info("Received Gateway url: {}", url);

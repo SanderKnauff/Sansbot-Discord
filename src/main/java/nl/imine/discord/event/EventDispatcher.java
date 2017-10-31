@@ -5,9 +5,11 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
+import nl.imine.vaccine.annotation.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Component
 public class EventDispatcher {
 
     private Logger logger = LoggerFactory.getLogger(EventDispatcher.class);

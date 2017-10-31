@@ -3,6 +3,8 @@ package nl.imine.discord.gateway;
 import java.util.concurrent.CountDownLatch;
 
 import nl.imine.discord.event.EventDispatcher;
+import nl.imine.vaccine.annotation.Component;
+import nl.imine.vaccine.annotation.Property;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.json.simple.JSONObject;
