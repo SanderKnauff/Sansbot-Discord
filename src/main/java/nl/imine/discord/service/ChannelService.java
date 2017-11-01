@@ -20,7 +20,9 @@ import nl.imine.discord.logic.Channel;
 import nl.imine.discord.model.Message;
 import nl.imine.discord.util.Rest;
 import nl.imine.discord.util.multipart.MultiPart;
+import nl.imine.vaccine.annotation.Component;
 
+@Component
 public class ChannelService {
 
 	private Logger logger = LoggerFactory.getLogger(ChannelService.class);
@@ -40,7 +42,7 @@ public class ChannelService {
 			String url = String.format("https://discordapp.com/api/channels/%s/messages", channel);
 			byte[] data;
 			HashMap<String, String> parameters = new HashMap<>();
-			if (message.getFile().length != 0) {
+			if (message.getFile() != null && message.getFile().length != 0) {
 				String boundary = createMultipartBoundaryString();
 				parameters.put("Content-Type", "multipart/form-data; boundary=" + boundary);
 

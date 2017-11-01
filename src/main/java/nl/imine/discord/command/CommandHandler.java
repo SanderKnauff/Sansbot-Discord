@@ -3,28 +3,41 @@ package nl.imine.discord.command;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.imine.discord.event.EventDispatcher;
 import nl.imine.discord.event.EventHandler;
 import nl.imine.discord.event.Listener;
 import nl.imine.discord.event.gateway.MessageCreateEvent;
 import nl.imine.discord.logic.User;
 import nl.imine.discord.model.Message;
 import nl.imine.discord.service.ChannelService;
+import nl.imine.vaccine.annotation.Component;
+import nl.imine.vaccine.annotation.Property;
 
+@Component
 public class CommandHandler implements Listener {
 
 	private final Logger logger = LoggerFactory.getLogger(CommandHandler.class);
 
 	private final Set<Command> commands;
 	private final ChannelService channelService;
+	private final EventDispatcher eventDispatcher;
 	private final String commandPrefix;
 
-	public CommandHandler(ChannelService channelService, String commandPrefix) {
+	public CommandHandler(EventDispatcher eventDispatcher, ChannelService channelService, @Property("sansbot.command.prefix") String commandPrefix) {
 		this.commands = new HashSet<>();
+		this.eventDispatcher = eventDispatcher;
 		this.channelService = channelService;
 		this.commandPrefix = commandPrefix;
+	}
+
+	@PostConstruct
+	public void onPostConstruct() {
+		eventDispatcher.registerListener(this);
 	}
 
 	@EventHandler

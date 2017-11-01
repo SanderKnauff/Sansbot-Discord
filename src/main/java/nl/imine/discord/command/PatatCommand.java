@@ -7,19 +7,30 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import nl.imine.discord.logic.User;
 import nl.imine.discord.model.Message;
 import nl.imine.discord.service.ChannelService;
+import nl.imine.vaccine.annotation.Component;
 
+@Component
 public class PatatCommand implements Command {
 
+	private final CommandHandler commandHandler;
 	private final ChannelService channelService;
 	private final List<String> triggers;
 
-	public PatatCommand(ChannelService channelService) {
+	public PatatCommand(CommandHandler commandHandler, ChannelService channelService) {
+		this.commandHandler = commandHandler;
 		this.channelService = channelService;
 		this.triggers = new ArrayList<>();
 		this.triggers.add("WeVliegenErIn");
+	}
+
+	@PostConstruct
+	public void postConstruct() {
+		commandHandler.registerCommand(this);
 	}
 
 	@Override

@@ -9,12 +9,15 @@ import java.net.URL;
 import java.util.Base64;
 import java.util.Map;
 
+import nl.imine.vaccine.annotation.Component;
+import nl.imine.vaccine.annotation.Property;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Component
 public class Rest {
 
 	private static final Logger logger = LoggerFactory.getLogger(Rest.class);
@@ -23,7 +26,7 @@ public class Rest {
 
 	private String botToken;
 
-	public Rest(String botToken) {
+	public Rest(@Property("discord.client.token") String botToken) {
 		this.botToken = botToken;
 	}
 

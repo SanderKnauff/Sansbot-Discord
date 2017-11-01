@@ -38,6 +38,7 @@ fabric.properties
 !libs/*.jar
 .DS_Store
 /target/
+dependency-reduced-pom.xml
 
 # Project specific files
 properties.ignore.txt
