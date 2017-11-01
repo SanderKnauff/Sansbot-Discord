@@ -22,12 +22,12 @@ public class Sansbot {
 		Properties properties = loadProperties();
 		Vaccine vaccine = new Vaccine();
 		vaccine.inject(properties, "nl.imine.discord");
-		Gateway gateway = (Gateway) vaccine.getInjected(Gateway.class);
-		try {
-			gateway.openWebSocket();
-		} catch (Exception e) {
-			logger.warn("Websocket Connection failed | Reason: ({}: {})", e.getClass().getSimpleName(), e.getMessage());
-		}
+//		Gateway gateway = (Gateway) vaccine.getInjected(Gateway.class);
+//		try {
+//			gateway.openWebSocket();
+//		} catch (Exception e) {
+//			logger.warn("Websocket Connection failed | Reason: ({}: {})", e.getClass().getSimpleName(), e.getMessage());
+//		}
 	}
 
 	public static Properties loadProperties() {

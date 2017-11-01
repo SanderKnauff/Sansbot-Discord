@@ -1,19 +1,22 @@
 package nl.imine.vaccine;
 
-import nl.imine.discord.gateway.Gateway;
 import nl.imine.vaccine.annotation.Component;
 import nl.imine.vaccine.annotation.Property;
+import nl.imine.vaccine.exception.CircularDependencyException;
+import nl.imine.vaccine.exception.UnknownDependencyException;
 import nl.imine.vaccine.model.ComponentDependency;
 import nl.imine.vaccine.model.Dependency;
 import nl.imine.vaccine.model.PropertyDependency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -40,10 +43,10 @@ public class Vaccine {
         }
         logger.info("Found following components:");
 
-        classes.forEach(c -> dependencies.add(getRequirementsForClass(c)));
+        classes.forEach(c -> dependencies.add(getRequirementsForClass(c, new ArrayList<>())));
     }
 
-    private ComponentDependency getRequirementsForClass(Class c) {
+    private ComponentDependency getRequirementsForClass(Class c, List<Class> parents) {
         Constructor[] constructors = c.getConstructors();
         if (constructors.length == 1) {
             Constructor constructor = constructors[0];
@@ -52,12 +55,19 @@ public class Vaccine {
             for (int i = 0; i < parameters.length; i++) {
                 Parameter parameter = parameters[i];
                 if (constructor.getParameters()[i].isAnnotationPresent(Property.class)) {
-                    Property property = (Property) parameter.getAnnotation(Property.class);
+                    Property property = parameter.getAnnotation(Property.class);
                     PropertyDependency propertyDependency = new PropertyDependency();
                     propertyDependency.setProperty(properties.get(property.value()));
                     constructorParameterTypes[i] = propertyDependency;
                 } else {
-                    ComponentDependency childDependency = getRequirementsForClass(parameter.getType());
+                    parents.add(c);
+                    if (parents.contains(parameter.getType())) {
+                        throw new CircularDependencyException(parents, parameter.getType());
+                    }
+                    ComponentDependency childDependency = getRequirementsForClass(parameter.getType(), new ArrayList<>(parents));
+                    if (childDependency == null) {
+                        throw new UnknownDependencyException(c, parameter.getType());
+                    }
                     if (dependencies.contains(childDependency)) {
                         for (Dependency dependency : dependencies) {
                             if (dependency.equals(childDependency)) {
@@ -73,27 +83,41 @@ public class Vaccine {
             }
             logger.info("\t {} with dependencies: {}", c.getName(), constructorParameterTypes);
             ComponentDependency componentDependency = new ComponentDependency(c, constructorParameterTypes);
-            resolveDependencies(componentDependency);
+            resolveDependencies(componentDependency, null);
             return componentDependency;
         } else {
-            throw new IllegalStateException("Could not create class " + c.getSimpleName() + " | Please make sure the component has exactly one constructor");
+            return null;
         }
     }
 
-    public void resolveDependencies(ComponentDependency dependency) {
+    public void resolveDependencies(ComponentDependency dependency, Class parent) {
         try {
+            //If the Component has no dependencies by itself, we can create it.
             if (dependency.getDependencies().length == 0) {
-                dependency.setObject(dependency.getType().getConstructors()[0].newInstance());
+                Object injectable = dependency.getType().getConstructors()[0].newInstance();
+                invokePostConstruct(injectable);
+                dependency.setObject(injectable);
+                //Otherwise list the dependencies and resolve them
             } else {
                 for (ComponentDependency child : dependencies) {
                     if (!child.isResolved()) {
-                        resolveDependencies(child);
+                        resolveDependencies(child, dependency.getType());
                     }
                 }
-                dependency.setObject(dependency.getType().getConstructors()[0].newInstance(Arrays.stream(dependency.getDependencies()).map(Dependency::getObject).collect(Collectors.toList()).toArray(new Object[dependency.getDependencies().length])));
+                Object injectable = dependency.getType().getConstructors()[0].newInstance(Arrays.stream(dependency.getDependencies()).map(Dependency::getObject).collect(Collectors.toList()).toArray(new Object[dependency.getDependencies().length]));
+                invokePostConstruct(injectable);
+                dependency.setObject(injectable);
             }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
             logger.error("Failed to create Component '{}' | Reason ({}: {})", dependency.getType().getSimpleName(), e.getClass().getSimpleName(), e.getMessage());
+        }
+    }
+
+    private void invokePostConstruct(Object injectable) throws IllegalAccessException, InvocationTargetException {
+        for (Method method : injectable.getClass().getMethods()) {
+            if (method.getParameterCount() == 0 && method.isAnnotationPresent(PostConstruct.class)) {
+                method.invoke(injectable);
+            }
         }
     }
 

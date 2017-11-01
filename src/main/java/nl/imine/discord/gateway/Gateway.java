@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import nl.imine.discord.util.Rest;
 
+import javax.annotation.PostConstruct;
+
 @Component
 public class Gateway {
 
@@ -28,6 +30,15 @@ public class Gateway {
 		this.rest = rest;
 		this.botToken = botToken;
 		this.eventDispatcher = eventDispatcher;
+	}
+
+	@PostConstruct
+	public void postConstruct(){
+		try {
+			this.openWebSocket();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void openWebSocket() throws Exception {
