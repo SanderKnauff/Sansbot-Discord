@@ -40,7 +40,12 @@ public class Rest {
 		logger.info("Request Properties:");
 		connection.getRequestProperties().forEach((k, v) -> logger.info("\t" + k + ": " + String.join(" ", v)));
 
-		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		BufferedReader bufferedReader;
+		if (200 <= connection.getResponseCode() && connection.getResponseCode() <= 299) {
+			bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		} else {
+			bufferedReader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+		}
 		String output;
 		StringBuilder ret = new StringBuilder();
 		while ((output = bufferedReader.readLine()) != null) {
@@ -49,22 +54,58 @@ public class Rest {
 		return (JSONObject) jsonParser.parse(ret.toString());
 	}
 
-	public String postSync(String url, Map<String, String> parameters, String data) throws IOException {
+	public JSONObject deleteSync(String url, Map<String, String> parameters) throws IOException, ParseException {
 		URL endpoint = new URL(url);
 		HttpURLConnection connection = (HttpURLConnection) endpoint.openConnection();
-		connection.setRequestMethod("POST");
+		connection.setRequestMethod("DELETE");
 		connection.setRequestProperty("accept", "text/json, application/json");
+		connection.setRequestProperty("accept-encoding", "gzip, deflate, br");
+		connection.setRequestProperty("User-Agent", "DiscordBot");
+		connection.setRequestProperty("Authorization", "Bot " + botToken);
+		parameters.forEach(connection::setRequestProperty);
+
+		logger.info("Request Properties:");
+		connection.getRequestProperties().forEach((k, v) -> logger.info("\t" + k + ": " + String.join(" ", v)));
+
+		BufferedReader bufferedReader;
+		if (200 <= connection.getResponseCode() && connection.getResponseCode() <= 299) {
+			bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		} else {
+			bufferedReader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+		}
+		String output;
+		StringBuilder ret = new StringBuilder();
+		while ((output = bufferedReader.readLine()) != null) {
+			ret.append(output);
+		}
+		return (JSONObject) jsonParser.parse(ret.toString());
+	}
+
+	public String postSync(String url, Map<String, String> parameters, byte[] data) throws IOException {
+		URL endpoint = new URL(url);
+		HttpURLConnection connection = (HttpURLConnection) endpoint.openConnection();
+
+		connection.setRequestMethod("POST");
+		connection.setRequestProperty("accept", "*/*");
 		connection.setRequestProperty("User-Agent", "DiscordBot");
 		connection.setRequestProperty("Authorization", "Bot " + botToken);
 		connection.setDoInput(true);
 		connection.setDoOutput(true);
 		parameters.forEach(connection::setRequestProperty);
 
+		logger.info("Request Properties:");
+		connection.getRequestProperties().forEach((k, v) -> logger.info("\t" + k + ": " + String.join(" ", v)));
+
 		OutputStream outputStream = connection.getOutputStream();
-		outputStream.write(data.getBytes());
+		outputStream.write(data);
 		outputStream.flush();
 
-		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		BufferedReader bufferedReader;
+		if (200 <= connection.getResponseCode() && connection.getResponseCode() <= 299) {
+			bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		} else {
+			bufferedReader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+		}
 		String output;
 		StringBuilder ret = new StringBuilder();
 		while ((output = bufferedReader.readLine()) != null) {

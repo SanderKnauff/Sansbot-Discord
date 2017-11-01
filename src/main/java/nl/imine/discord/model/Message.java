@@ -6,7 +6,6 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.sun.xml.internal.ws.api.message.Attachment;
 import nl.imine.discord.logic.User;
 import nl.imine.discord.util.jackson.LocalDateTimeDeserializer;
 import nl.imine.discord.util.jackson.LocalDateTimeSerializer;
@@ -29,6 +28,7 @@ public class Message {
 	@JsonProperty("mention_everyone")
 	private boolean mentionEveryone;
 	private Set<User> mentions;
+	private byte[] file;
 	@JsonProperty("mention_roles")
 	private Set<Role> mentionRoles;
 	private Set<Attachment> attachments;
@@ -41,10 +41,9 @@ public class Message {
 	private MessageType type;
 
 	public Message() {
-
 	}
 
-	public Message(String id, String channelId, User author, String content, LocalDateTime timestamp, LocalDateTime editedTimestamp, boolean tts, boolean mentionEveryone, Set<User> mentions, Set<Role> mentionRoles, Set<Attachment> attachments, Set<Embed> embeds, Set<Reaction> reactions, String nonce, boolean pinned, String webhookId, MessageType type) {
+	public Message(String id, String channelId, User author, String content, LocalDateTime timestamp, LocalDateTime editedTimestamp, boolean tts, boolean mentionEveryone, Set<User> mentions, byte[] file, Set<Role> mentionRoles, Set<Attachment> attachments, Set<Embed> embeds, Set<Reaction> reactions, String nonce, boolean pinned, String webhookId, MessageType type) {
 		this.id = id;
 		this.channelId = channelId;
 		this.author = author;
@@ -54,6 +53,7 @@ public class Message {
 		this.tts = tts;
 		this.mentionEveryone = mentionEveryone;
 		this.mentions = mentions;
+		this.file = file;
 		this.mentionRoles = mentionRoles;
 		this.attachments = attachments;
 		this.embeds = embeds;
@@ -134,6 +134,14 @@ public class Message {
 
 	public void setMentions(Set<User> mentions) {
 		this.mentions = mentions;
+	}
+
+	public byte[] getFile() {
+		return file;
+	}
+
+	public void setFile(byte[] file) {
+		this.file = file;
 	}
 
 	public Set<Role> getMentionRoles() {

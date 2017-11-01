@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Properties;
 
+import nl.imine.discord.command.CommandHandler;
+import nl.imine.discord.command.PatatCommand;
 import nl.imine.discord.event.Event;
 import nl.imine.discord.event.EventDispatcher;
 import org.json.simple.parser.ParseException;
@@ -11,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.imine.discord.gateway.Gateway;
+import nl.imine.discord.service.ChannelService;
 import nl.imine.discord.util.Rest;
 
 public class Sansbot {
@@ -25,6 +28,10 @@ public class Sansbot {
 		String botToken = properties.getProperty("discord.client.token");
 		eventDispatcher = new EventDispatcher();
 		rest = new Rest(botToken);
+		ChannelService channelService = new ChannelService(rest);
+		CommandHandler commandHandler = new CommandHandler(channelService, properties.getProperty("sansbot.command.prefix"));
+		commandHandler.registerCommand(new PatatCommand(channelService));
+		eventDispatcher.registerListener(commandHandler);
 		try {
 			new Gateway(rest, eventDispatcher).openWebSocket(botToken);
 		} catch (URISyntaxException | ParseException e) {

@@ -7,8 +7,10 @@ import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import nl.imine.discord.event.Event;
 import nl.imine.discord.event.EventDispatcher;
+
 import org.eclipse.jetty.websocket.api.Session;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -54,7 +56,7 @@ public class WebSocketMessageHandler {
 				case EVENT:
 					EventMessage eventMessage = EventMessage.fromJSON(message);
 					try {
-						if(eventMessage.getEventType().getEventClass() != null) {
+						if (eventMessage.getEventType().getEventClass() != null) {
 							ObjectMapper objectMapper = new ObjectMapper();
 							objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 							eventDispatcher.callEvent((Event) objectMapper.readValue(message.toJSONString(), eventMessage.getEventType().getEventClass()));
@@ -63,29 +65,6 @@ public class WebSocketMessageHandler {
 						e.printStackTrace();
 					}
 					logger.info("EventMessage({}): {}", eventMessage.getEventType(), eventMessage.getEventData().toJSONString());
-
-					//TEMP
-					if(EventType.MESSAGE_CREATE.equals(eventMessage.getEventType())) {
-						if(eventMessage.getEventData().get("content").toString().equalsIgnoreCase("!WeVliegenErin")) {
-							new Channel(String.valueOf(eventMessage.getEventData().get("channel_id")),
-									null,
-									null,
-									0,
-									null,
-									null,
-									null,
-									false,
-									null,
-									0,
-									1,
-									null,
-									null,
-									null,
-									null,
-									null).sendMessage("PATAT!");
-						}
-					}
-					//END TEMP
 					break;
 				case HELLO:
 					HelloMessage helloMessage = HelloMessage.fromJSON((JSONObject) message.get("d"));

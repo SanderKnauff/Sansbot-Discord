@@ -1,15 +1,9 @@
 package nl.imine.discord.logic;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import nl.imine.discord.Sansbot;
-import nl.imine.discord.model.Message;
 
 public class Channel {
 
@@ -26,7 +20,7 @@ public class Channel {
 	private String lastMessageId;
 	private int bitrate;
 	private int userLimit;
-	private List<User> receipients;
+	private List<User> recipients;
 	private String icon;
 	private String ownerId;
 	private String applicationId;
@@ -44,25 +38,11 @@ public class Channel {
 		this.lastMessageId = lastMessageId;
 		this.bitrate = bitrate;
 		this.userLimit = userLimit;
-		this.receipients = receipients;
+		this.recipients = receipients;
 		this.icon = icon;
 		this.ownerId = ownerId;
 		this.applicationId = applicationId;
 		this.parentId = parentId;
-	}
-
-	public void sendMessage(String message) {
-		Message content = new Message(null, id, null, null, null, null, false, false, null, null, null, null, null, null, false, null, null);
-		try {
-			String url = String.format("https://discordapp.com/api/channels/%s/messages", id);
-			String data = new ObjectMapper().writeValueAsString(content);
-			logger.info("Send message to url: {}. Content: {}", url, data);
-			HashMap<String, String> parameters = new HashMap<>();
-			parameters.put("Content-Type", "application/json");
-			Sansbot.rest.postSync(url, parameters, data);
-		} catch (IOException e) {
-			logger.warn("Failed to send message ({}: {})", e.getClass().getSimpleName(), e.getMessage());
-		}
 	}
 
 	public String getId() {
@@ -153,12 +133,12 @@ public class Channel {
 		this.userLimit = userLimit;
 	}
 
-	public List<User> getReceipients() {
-		return receipients;
+	public List<User> getRecipients() {
+		return recipients;
 	}
 
-	public void setReceipients(List<User> receipients) {
-		this.receipients = receipients;
+	public void setRecipients(List<User> recipients) {
+		this.recipients = recipients;
 	}
 
 	public String getIcon() {
