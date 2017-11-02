@@ -27,23 +27,28 @@ public class Vaccine {
 
     private static Logger logger = LoggerFactory.getLogger(Vaccine.class);
 
-    private Set<ComponentDependency> dependencies = new HashSet<>();
+    private List<ComponentDependency> dependencies = new ArrayList<>();
 
     private Properties properties;
 
     public void inject(Properties properties, String basePackage) {
         logger.info("Initializing Injection");
         this.properties = properties;
+
         List<Class> classes = null;
         try {
             classes = getClassesForPackage(basePackage).stream().filter(c -> c.isAnnotationPresent(Component.class)).collect(Collectors.toList());
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
             throw new RuntimeException("Could not load packages");
         }
-        logger.info("Found following components:");
 
-        classes.forEach(c -> dependencies.add(getRequirementsForClass(c, new ArrayList<>())));
+        logger.info("Found following components:");
+        classes.forEach(c -> {
+            if (dependencies.stream().noneMatch(d -> d.getType().equals(c))) {
+                ComponentDependency requirementsForClass = getRequirementsForClass(c, new ArrayList<>());
+                dependencies.add(requirementsForClass);
+            }
+        });
     }
 
     private ComponentDependency getRequirementsForClass(Class c, List<Class> parents) {
@@ -55,10 +60,7 @@ public class Vaccine {
             for (int i = 0; i < parameters.length; i++) {
                 Parameter parameter = parameters[i];
                 if (constructor.getParameters()[i].isAnnotationPresent(Property.class)) {
-                    Property property = parameter.getAnnotation(Property.class);
-                    PropertyDependency propertyDependency = new PropertyDependency();
-                    propertyDependency.setProperty(properties.get(property.value()));
-                    constructorParameterTypes[i] = propertyDependency;
+                    constructorParameterTypes[i] = resolvePropertyDependency(parameter);
                 } else {
                     parents.add(c);
                     if (parents.contains(parameter.getType())) {
@@ -88,6 +90,13 @@ public class Vaccine {
         } else {
             return null;
         }
+    }
+
+    private PropertyDependency resolvePropertyDependency(Parameter parameter) {
+        Property property = parameter.getAnnotation(Property.class);
+        PropertyDependency propertyDependency = new PropertyDependency();
+        propertyDependency.setProperty(properties.get(property.value()));
+        return propertyDependency;
     }
 
     public void resolveDependencies(ComponentDependency dependency, Class parent) {
@@ -154,20 +163,22 @@ public class Vaccine {
         ArrayList<java.lang.Class> classes = new ArrayList<java.lang.Class>();
         // For every directory identified capture all the .class files
         for (File directory : directories) {
-            if (directory.exists()) {
+            if (directory.exists() && directory.isDirectory()) {
                 // Get the list of the files contained in the package
                 String[] files = directory.list();
-                for (String file : files) {
-                    // we are only interested in .class files
-                    if (file.endsWith(".class")) {
-                        // removes the .class extension
-                        try {
-                            classes.add(java.lang.Class.forName(packageName + '.' + file.substring(0, file.length() - 6)));
-                        } catch (NoClassDefFoundError e) {
-                            // do nothing. this class hasn't been found by the loader, and we don't care.
+                if (files != null) {
+                    for (String file : files) {
+                        // we are only interested in .class files
+                        if (file.endsWith(".class")) {
+                            // removes the .class extension
+                            try {
+                                classes.add(Class.forName(packageName + '.' + file.substring(0, file.length() - 6)));
+                            } catch (NoClassDefFoundError e) {
+                                // do nothing. this class hasn't been found by the loader, and we don't care.
+                            }
+                        } else {
+                            classes.addAll(getClassesForPackage(packageName + "." + file));
                         }
-                    } else {
-                        classes.addAll(getClassesForPackage(packageName + "." + file));
                     }
                 }
             } else {
@@ -186,6 +197,10 @@ public class Vaccine {
 //        }
 //        return ret;
 //    }
+
+    public List<ComponentDependency> getDependencies() {
+        return dependencies;
+    }
 
     public Object getInjected(Class type) {
         for (Dependency dependency : dependencies) {

@@ -2,7 +2,7 @@ package nl.imine.vaccine.testresources.circularcomplex;
 
 import nl.imine.vaccine.annotation.Component;
 
-public class CircularComplex {
+public class CircularComplexComponents {
 
     //Dependency circle A->B->C->E->D->A
 
