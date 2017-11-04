@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public abstract class GatewayPayload {
 
-    @JsonProperty("s")
     private Integer sequenceNumber;
 
     public GatewayPayload() {

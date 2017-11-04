@@ -23,8 +23,9 @@ public class HeartbeatTask implements Runnable {
 	public void run() {
 		if (acknowledged) {
 			try {
-				String message = Sansbot.objectMapper().writeValueAsString(new HeartbeatMessage(sequence));
-				logger.info("Heartbeat: {}", message);
+				HeartbeatMessage heartbeatMessage = new HeartbeatMessage(sequence);
+				String message = Sansbot.objectMapper().writeValueAsString(heartbeatMessage);
+				logger.debug("Sending Heartbeat(Opcode {}) to Discord with Sequence number {}", heartbeatMessage.getOpcode(), heartbeatMessage.getSequenceNumber());
 				session.getRemote().sendStringByFuture(message);
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();
