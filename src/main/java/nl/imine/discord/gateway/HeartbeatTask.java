@@ -1,14 +1,19 @@
 package nl.imine.discord.gateway;
 
-import org.eclipse.jetty.websocket.api.Session;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import nl.imine.discord.Sansbot;
 import nl.imine.discord.gateway.messages.HeartbeatMessage;
+import org.eclipse.jetty.websocket.api.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HeartbeatTask implements Runnable {
 
+	private static final Logger logger = LoggerFactory.getLogger(HeartbeatTask.class);
+
 	private final Session session;
 	private boolean acknowledged = true;
-	private int sequence = -1;
+	private Integer sequence = null;
 
 	public HeartbeatTask(Session session) {
 		this.session = session;
@@ -17,7 +22,13 @@ public class HeartbeatTask implements Runnable {
 	@Override
 	public void run() {
 		if (acknowledged) {
-			session.getRemote().sendStringByFuture(new HeartbeatMessage(sequence).createMessage().toJSONString());
+			try {
+				String message = Sansbot.objectMapper().writeValueAsString(new HeartbeatMessage(sequence));
+				logger.info("Heartbeat: {}", message);
+				session.getRemote().sendStringByFuture(message);
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
 			acknowledged = false;
 		} else {
 			if (session.isOpen()) {
@@ -34,11 +45,11 @@ public class HeartbeatTask implements Runnable {
 		this.acknowledged = acknowledged;
 	}
 
-	public int getSequence() {
+	public Integer getSequence() {
 		return sequence;
 	}
 
-	public void setSequence(int sequence) {
+	public void setSequence(Integer sequence) {
 		this.sequence = sequence;
 	}
 }

@@ -10,7 +10,7 @@ public enum EventType {
 	READY(null),
 	TYPING_START(null),
 	PRESENCE_UPDATE(null),
-	VOICE_STATUS_UPDATE(null);
+	VOICE_STATE_UPDATE(null);
 
 	private Class eventClass;
 
@@ -20,6 +20,17 @@ public enum EventType {
 
 	public Class getEventClass() {
 		return eventClass;
+	}
+
+	public static EventType getFromName(String name) {
+		EventType returnType = null;
+		for (EventType eventType : values()) {
+			if (eventType.name().equals(name)) {
+				returnType = eventType;
+				break;
+			}
+		}
+		return returnType;
 	}
 
 }

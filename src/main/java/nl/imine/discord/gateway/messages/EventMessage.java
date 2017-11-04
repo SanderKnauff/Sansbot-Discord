@@ -1,44 +1,42 @@
 package nl.imine.discord.gateway.messages;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.json.simple.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import nl.imine.discord.event.Event;
 import nl.imine.discord.event.gateway.EventType;
 
-public class EventMessage extends WebSocketMessage {
+public class EventMessage extends GatewayPayload {
 
-	private static Logger logger = LoggerFactory.getLogger(EventMessage.class);
+    private static final Opcode code = Opcode.EVENT;
 
-	private final EventType eventType;
-	private final JSONObject eventData;
+    @JsonProperty("t")
+    private EventType eventType;
+    @JsonProperty("d")
+    private Event payloadData;
 
-	public EventMessage(EventType eventType, JSONObject eventData) {
-		this.eventType = eventType;
-		this.eventData = eventData;
-	}
+    public EventMessage() {
 
-	public EventType getEventType() {
-		return eventType;
-	}
+    }
 
-	public JSONObject getEventData() {
-		return eventData;
-	}
+    public EventMessage(Integer sequenceNumber, EventType eventType, Event payloadData) {
+        super(sequenceNumber);
+        this.eventType = eventType;
+        this.payloadData = payloadData;
+    }
 
-	@Override
-	public JSONObject createMessage() {
-		return null;
-	}
+    public EventType getEventType() {
+        return eventType;
+    }
 
-	public static EventMessage fromJSON(JSONObject jsonObject) {
-		EventType t = null;
-		try {
-			t = EventType.valueOf(jsonObject.get("t").toString());
-		} catch (Exception e) {
-			logger.warn("Unknown Event type: {}", jsonObject.get("t").toString());
-		}
-		return new EventMessage(t, (JSONObject) jsonObject.get("d"));
-	}
+    public Event getPayloadData() {
+        return payloadData;
+    }
+
+    public void setPayloadData(Event payloadData) {
+        this.payloadData = payloadData;
+    }
+
+    @Override
+    public Opcode getOpcode() {
+        return code;
+    }
 }

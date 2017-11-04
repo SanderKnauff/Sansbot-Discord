@@ -1,5 +1,6 @@
 package nl.imine.discord.gateway;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import nl.imine.discord.event.EventDispatcher;
 import nl.imine.discord.util.Rest;
 import nl.imine.vaccine.annotation.Component;
@@ -7,7 +8,6 @@ import nl.imine.vaccine.annotation.Property;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
-import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,8 +40,8 @@ public class Gateway {
     }
 
     public void openWebSocket() throws Exception {
-        JSONObject ret = rest.getSync("https://discordapp.com/api/gateway", new HashMap<>());
-        String url = (String) ret.get("url") + "/?v=6&encoding=json";
+        JsonNode ret = rest.getSync("https://discordapp.com/api/gateway", new HashMap<>());
+        String url = ret.get("url").asText() + "/?v=6&encoding=json";
         logger.info("Received Gateway url: {}", url);
 
         SslContextFactory ssl = new SslContextFactory();

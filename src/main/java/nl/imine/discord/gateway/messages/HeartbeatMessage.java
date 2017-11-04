@@ -1,32 +1,29 @@
 package nl.imine.discord.gateway.messages;
 
-import org.json.simple.JSONObject;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class HeartbeatMessage extends WebSocketMessage {
+public class HeartbeatMessage extends GatewayPayload {
 
-	private static final Opcode code = Opcode.HEARTBEAT;
+    private static final Opcode code = Opcode.HEARTBEAT;
 
-	//d key
-	private final int sequence;
+    public HeartbeatMessage() {
 
-	public HeartbeatMessage(int sequence) {
-		this.sequence = sequence;
-	}
+    }
 
-	public static Opcode getCode() {
-		return code;
-	}
+    public HeartbeatMessage(Integer sequenceNumber) {
+        super(sequenceNumber);
+    }
 
-	public int getSequence() {
-		return sequence;
-	}
+    @Override
+    public Opcode getOpcode() {
+        return code;
+    }
 
-	@Override
-	public JSONObject createMessage() {
-		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("op", code.getCode());
-		jsonObject.put("d", (sequence != -1 ? sequence : "null"));
-		return jsonObject;
-	}
-
+    @Override
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    @JsonProperty("d")
+    public Integer getSequenceNumber() {
+        return super.getSequenceNumber();
+    }
 }

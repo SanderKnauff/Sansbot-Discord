@@ -1,22 +1,19 @@
 package nl.imine.discord.gateway.messages;
 
-import org.json.simple.JSONObject;
+public class AckMessage extends GatewayPayload {
 
-public class AckMessage extends WebSocketMessage {
+    private static final Opcode code = Opcode.ACK;
 
-	private static final Opcode code = Opcode.ACK;
+    public AckMessage() {
 
-	public AckMessage() {
-	}
+    }
 
-	@Override
-	public JSONObject createMessage() {
-		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("op", code.getCode());
-		return jsonObject;
-	}
+    public AckMessage(Integer sequenceNumber) {
+        super(sequenceNumber);
+    }
 
-	public static AckMessage fromJSON(JSONObject jsonObject) {
-		return new AckMessage();
-	}
+    @Override
+    public Opcode getOpcode() {
+        return code;
+    }
 }

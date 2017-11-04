@@ -4,6 +4,7 @@ import nl.imine.vaccine.exception.CircularDependencyException;
 import nl.imine.vaccine.exception.UnknownDependencyException;
 import nl.imine.vaccine.model.ComponentDependency;
 import nl.imine.vaccine.testresources.property.PropertyTestComponents;
+import nl.imine.vaccine.testresources.provider.ProviderComponents;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -64,5 +65,11 @@ public class VaccineTest {
         vaccine.inject(new Properties(), "nl.imine.vaccine.testresources.complextree");
         Map<Class, Long> occurrences = vaccine.getDependencies().stream().collect(Collectors.groupingBy(ComponentDependency::getType, Collectors.counting()));
         occurrences.forEach((k, v) -> assertEquals(1, (long) v));
+    }
+
+    @Test
+    public void testProviderAnnotation() {
+        vaccine.inject(new Properties(), "nl.imine.vaccine.testresources.provider");
+        assertNotNull(((ProviderComponents.ParentB) vaccine.getInjected(ProviderComponents.ParentB.class)).getChildProvided());
     }
 }

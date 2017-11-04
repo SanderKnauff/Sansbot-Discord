@@ -1,26 +1,21 @@
 package nl.imine.discord.service;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.*;
-
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
-
-import org.json.simple.parser.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import nl.imine.discord.Sansbot;
 import nl.imine.discord.logic.Channel;
 import nl.imine.discord.model.Message;
 import nl.imine.discord.util.Rest;
 import nl.imine.discord.util.multipart.MultiPart;
 import nl.imine.vaccine.annotation.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.*;
 
 @Component
 public class ChannelService {
@@ -69,8 +64,8 @@ public class ChannelService {
 				logger.info("Boundary: {}", boundary);
 			} else {
 				parameters.put("Content-Type", "application/json");
-				data = new ObjectMapper().writeValueAsString(message).getBytes();
-			}
+                data = Sansbot.objectMapper().writeValueAsString(message).getBytes();
+            }
 			logger.debug("Send message to url: {}. Content: \n{}", url, data);
 			logger.info(rest.postSync(url, parameters, data));
 		} catch (IOException e) {
@@ -87,8 +82,8 @@ public class ChannelService {
 			String url = String.format("https://discordapp.com/api/channels/%s/messages/%s", channel, message);
 			logger.debug("Delete message {} from channel {}", message, channel);
 			rest.deleteSync(url, new HashMap<>());
-		} catch (IOException | ParseException e) {
-			logger.warn("Failed to send message ({}: {})", e.getClass().getSimpleName(), e.getMessage());
+        } catch (IOException e) {
+            logger.warn("Failed to send message ({}: {})", e.getClass().getSimpleName(), e.getMessage());
 		}
 	}
 
