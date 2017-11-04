@@ -1,19 +1,17 @@
 package nl.imine.vaccine;
 
-import nl.imine.discord.command.Command;
 import nl.imine.vaccine.annotation.Component;
 import nl.imine.vaccine.annotation.Property;
+import nl.imine.vaccine.annotation.Provided;
 import nl.imine.vaccine.exception.CircularDependencyException;
 import nl.imine.vaccine.exception.UnknownDependencyException;
 import nl.imine.vaccine.model.ComponentDependency;
 import nl.imine.vaccine.model.Dependency;
 import nl.imine.vaccine.model.PropertyDependency;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -116,7 +114,7 @@ public class Vaccine {
 				//If the Component has no dependencies by itself, we can create it.
 				if (dependency.getDependencies().length == 0) {
 					injectable = dependency.getType().getConstructors()[0].newInstance();
-					invokePostConstruct(injectable);
+					afterCreation(injectable);
 					//Otherwise list the dependencies and resolve them
 				} else {
 					for (ComponentDependency child : dependencies) {
@@ -125,7 +123,7 @@ public class Vaccine {
 						}
 					}
 					injectable = dependency.getType().getConstructors()[0].newInstance(Arrays.stream(dependency.getDependencies()).map(Dependency::getObject).collect(Collectors.toList()).toArray(new Object[dependency.getDependencies().length]));
-					invokePostConstruct(injectable);
+					afterCreation(injectable);
 				}
 			} catch (InstantiationException | IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
 				logger.error("Failed to create Component '{}' | Reason ({}: {})", dependency.getType().getSimpleName(), e.getClass().getSimpleName(), e.getMessage());
@@ -134,13 +132,22 @@ public class Vaccine {
 		}
 	}
 
-	private void invokePostConstruct(Object injectable) throws IllegalAccessException, InvocationTargetException {
-		for (Method method : injectable.getClass().getMethods()) {
-			if (method.getParameterCount() == 0 && method.isAnnotationPresent(PostConstruct.class)) {
-				method.invoke(injectable);
-			}
-		}
-	}
+    private void afterCreation(Object injectable) throws IllegalAccessException, InvocationTargetException {
+        for (Method method : injectable.getClass().getMethods()) {
+            //Register @Provided
+            if (method.isAnnotationPresent(Provided.class) && !method.getReturnType().equals(Void.class) && method.getParameterCount() == 0) {
+                ComponentDependency componentDependency = new ComponentDependency(method.getReturnType(), new Dependency[0]);
+                if (!dependencies.contains(componentDependency)) {
+                    componentDependency.setObject(method.invoke(injectable));
+                    dependencies.add(componentDependency);
+                }
+            }
+            //Run @PostConstruct
+            if (method.getParameterCount() == 0 && method.isAnnotationPresent(PostConstruct.class)) {
+                method.invoke(injectable);
+            }
+        }
+    }
 
 	/**
 	 * Attempts to list all the classes in the specified package as determined
