@@ -34,6 +34,8 @@ public class ProviderComponents {
     }
 
     public static class ChildProvided {
+        private ChildProvided() {
 
+        }
     }
 }

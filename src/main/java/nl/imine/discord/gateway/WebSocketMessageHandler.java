@@ -1,20 +1,22 @@
 package nl.imine.discord.gateway;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import org.eclipse.jetty.websocket.api.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
-import nl.imine.discord.Sansbot;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import nl.imine.discord.event.EventDispatcher;
 import nl.imine.discord.gateway.messages.*;
 import nl.imine.discord.gateway.messages.data.IdentifyMessageData;
 import nl.imine.discord.model.ConnectionProperties;
 import nl.imine.discord.model.Game;
 import nl.imine.discord.model.UserStatus;
-import org.eclipse.jetty.websocket.api.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class WebSocketMessageHandler {
 
@@ -22,14 +24,16 @@ public class WebSocketMessageHandler {
     private static ScheduledExecutorService executorService = Executors.newScheduledThreadPool(10);
 
     private final Session session;
+    private final ObjectMapper objectMapper;
     private final EventDispatcher eventDispatcher;
     private HeartbeatTask heartbeatTask;
     private String botToken;
 
-    public WebSocketMessageHandler(Session session, EventDispatcher eventDispatcher, String botToken) {
+    public WebSocketMessageHandler(Session session, ObjectMapper objectMapper, EventDispatcher eventDispatcher, String botToken) {
         this.session = session;
+        this.objectMapper = objectMapper;
         this.eventDispatcher = eventDispatcher;
-        this.heartbeatTask = new HeartbeatTask(session);
+        this.heartbeatTask = new HeartbeatTask(session, objectMapper);
         this.botToken = botToken;
     }
 
@@ -65,7 +69,7 @@ public class WebSocketMessageHandler {
                     );
 
                     try {
-                        String text = Sansbot.objectMapper().writeValueAsString(identifyMessage);
+                        String text = objectMapper.writeValueAsString(identifyMessage);
                         logger.info("Identifying: {}", text);
                         session.getRemote().sendStringByFuture(text);
                     } catch (JsonProcessingException e) {

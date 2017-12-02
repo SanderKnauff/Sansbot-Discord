@@ -18,7 +18,6 @@ import java.util.Properties;
 public class Sansbot {
 
     private static final Logger logger = LoggerFactory.getLogger(Sansbot.class);
-    private static ObjectMapper objectMapper = null;
 
     public static void main(String[] args) throws IOException {
         Vaccine vaccine = new Vaccine();
@@ -39,18 +38,4 @@ public class Sansbot {
         return properties;
     }
 
-    public static ObjectMapper objectMapper() {
-        if (objectMapper == null) {
-            objectMapper = new ObjectMapper();
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            SimpleModule simpleModule = new SimpleModule();
-            simpleModule.addSerializer(new OpcodeSerializer());
-            simpleModule.addSerializer(new GameTypeSerializer());
-            simpleModule.addDeserializer(GatewayPayload.class, new GatewayPayloadDeserializer());
-            objectMapper.registerModule(simpleModule);
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        }
-        return objectMapper;
-
-    }
 }

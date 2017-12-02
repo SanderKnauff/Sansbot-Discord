@@ -1,6 +1,8 @@
 package nl.imine.discord.gateway;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import nl.imine.discord.event.EventDispatcher;
 import nl.imine.discord.util.Rest;
 import nl.imine.vaccine.annotation.Component;
@@ -20,14 +22,16 @@ public class Gateway {
 
     private static final Logger logger = LoggerFactory.getLogger(Gateway.class);
 
-    private final EventDispatcher eventDispatcher;
     private final Rest rest;
+    private final ObjectMapper objectMapper;
+    private final EventDispatcher eventDispatcher;
     private final String botToken;
 
-    public Gateway(@Property("discord.client.token") String botToken, Rest rest, EventDispatcher eventDispatcher) {
+    public Gateway(Rest rest, ObjectMapper objectMapper, EventDispatcher eventDispatcher, @Property("discord.client.token") String botToken) {
         this.rest = rest;
-        this.botToken = botToken;
+        this.objectMapper = objectMapper;
         this.eventDispatcher = eventDispatcher;
+        this.botToken = botToken;
     }
 
     @PostConstruct
@@ -52,7 +56,7 @@ public class Gateway {
         ClientUpgradeRequest request = new ClientUpgradeRequest();
         request.setHeader("Authorization", "bot " + botToken);
         webSocket.start();
-        GatewaySocket gatewaySocket = new GatewaySocket(botToken, eventDispatcher);
+        GatewaySocket gatewaySocket = new GatewaySocket(objectMapper, eventDispatcher, botToken);
         webSocket.connect(gatewaySocket, new URI(url), request);
 
         logger.info("WebSocket is connected: {}", gatewaySocket.isConnected());

@@ -1,5 +1,6 @@
 package nl.imine.discord.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.imine.discord.Sansbot;
 import nl.imine.discord.logic.Channel;
 import nl.imine.discord.model.Message;
@@ -22,10 +23,12 @@ public class ChannelService {
 
 	private Logger logger = LoggerFactory.getLogger(ChannelService.class);
 
-	private Rest rest;
+	private final Rest rest;
+	private final ObjectMapper objectMapper;
 
-	public ChannelService(Rest rest) {
+	public ChannelService(Rest rest, ObjectMapper objectMapper) {
 		this.rest = rest;
+		this.objectMapper = objectMapper;
 	}
 
 	public void createMessage(Channel channel, Message message) {
@@ -64,7 +67,7 @@ public class ChannelService {
 				logger.info("Boundary: {}", boundary);
 			} else {
 				parameters.put("Content-Type", "application/json");
-                data = Sansbot.objectMapper().writeValueAsString(message).getBytes();
+                data = objectMapper.writeValueAsString(message).getBytes();
             }
 			logger.debug("Send message to url: {}. Content: \n{}", url, data);
 			logger.info(rest.postSync(url, parameters, data));

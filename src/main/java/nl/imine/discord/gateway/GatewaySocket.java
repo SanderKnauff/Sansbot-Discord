@@ -2,7 +2,7 @@ package nl.imine.discord.gateway;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import nl.imine.discord.Sansbot;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.imine.discord.event.EventDispatcher;
 import nl.imine.discord.gateway.messages.GatewayPayload;
 import org.eclipse.jetty.websocket.api.Session;
@@ -17,16 +17,18 @@ public class GatewaySocket extends WebSocketAdapter {
 
     private static Logger logger = LoggerFactory.getLogger(GatewaySocket.class);
 
+    private final ObjectMapper objectMapper;
     private final CountDownLatch closeLatch;
     private final EventDispatcher eventDispatcher;
     private WebSocketMessageHandler webSocketMessageHandler;
     private Session session;
     private String botToken;
 
-    public GatewaySocket(String botToken, EventDispatcher eventDispatcher) {
+    public GatewaySocket(ObjectMapper objectMapper, EventDispatcher eventDispatcher, String botToken) {
         this.closeLatch = new CountDownLatch(1);
-        this.botToken = botToken;
+        this.objectMapper = objectMapper;
         this.eventDispatcher = eventDispatcher;
+        this.botToken = botToken;
     }
 
     @Override
@@ -40,14 +42,14 @@ public class GatewaySocket extends WebSocketAdapter {
     public void onWebSocketConnect(Session session) {
         logger.info("Connected: {}", session);
         this.session = session;
-        this.webSocketMessageHandler = new WebSocketMessageHandler(session, eventDispatcher, botToken);
+        this.webSocketMessageHandler = new WebSocketMessageHandler(session, objectMapper, eventDispatcher, botToken);
     }
 
     @Override
     public void onWebSocketText(String message) {
         logger.trace("Received Message: {}", message);
         try {
-            GatewayPayload gatewayPayload = Sansbot.objectMapper().readValue(message, GatewayPayload.class);
+            GatewayPayload gatewayPayload = objectMapper.readValue(message, GatewayPayload.class);
             webSocketMessageHandler.handleMessage(gatewayPayload);
         } catch (JsonParseException e) {
             logger.warn("Json parsing failed: ({}: {})", e.getClass().getSimpleName(), e.getMessage());

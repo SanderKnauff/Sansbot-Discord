@@ -46,9 +46,9 @@ public class GatewayPayloadDeserializer extends StdDeserializer<GatewayPayload> 
                     eventType,
                     d);
         }
-        return (GatewayPayload) Sansbot.objectMapper()
+        return (GatewayPayload) codec
                 .readValue(
-                        jsonNode.toString(),
+                        jsonNode.traverse(),
                         opcode.getType());
     }
 }

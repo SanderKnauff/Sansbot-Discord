@@ -1,22 +1,26 @@
 package nl.imine.discord.gateway;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import nl.imine.discord.Sansbot;
-import nl.imine.discord.gateway.messages.HeartbeatMessage;
 import org.eclipse.jetty.websocket.api.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import nl.imine.discord.gateway.messages.HeartbeatMessage;
 
 public class HeartbeatTask implements Runnable {
 
 	private static final Logger logger = LoggerFactory.getLogger(HeartbeatTask.class);
 
 	private final Session session;
+	private final ObjectMapper objectMapper;
 	private boolean acknowledged = true;
 	private Integer sequence = null;
 
-	public HeartbeatTask(Session session) {
+	public HeartbeatTask(Session session, ObjectMapper objectMapper) {
 		this.session = session;
+		this.objectMapper = objectMapper;
 	}
 
 	@Override
@@ -24,7 +28,7 @@ public class HeartbeatTask implements Runnable {
 		if (acknowledged) {
 			try {
 				HeartbeatMessage heartbeatMessage = new HeartbeatMessage(sequence);
-				String message = Sansbot.objectMapper().writeValueAsString(heartbeatMessage);
+				String message = objectMapper.writeValueAsString(heartbeatMessage);
 				logger.debug("Sending Heartbeat(Opcode {}) to Discord with Sequence number {}", heartbeatMessage.getOpcode(), heartbeatMessage.getSequenceNumber());
 				session.getRemote().sendStringByFuture(message);
 			} catch (JsonProcessingException e) {
