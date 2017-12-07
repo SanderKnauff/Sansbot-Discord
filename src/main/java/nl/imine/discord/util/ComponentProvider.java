@@ -6,9 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import nl.imine.discord.gateway.messages.GatewayPayload;
-import nl.imine.discord.util.jackson.GameTypeSerializer;
-import nl.imine.discord.util.jackson.GatewayPayloadDeserializer;
-import nl.imine.discord.util.jackson.OpcodeSerializer;
+import nl.imine.discord.util.jackson.*;
+import nl.imine.discord.voice.socket.VoicePayload;
 import nl.imine.vaccine.annotation.Component;
 import nl.imine.vaccine.annotation.Provided;
 
@@ -25,8 +24,10 @@ public class ComponentProvider {
 		objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 		SimpleModule simpleModule = new SimpleModule();
 		simpleModule.addSerializer(new OpcodeSerializer());
+		simpleModule.addSerializer(new VoiceOpcodeSerializer());
 		simpleModule.addSerializer(new GameTypeSerializer());
 		simpleModule.addDeserializer(GatewayPayload.class, new GatewayPayloadDeserializer());
+		simpleModule.addDeserializer(VoicePayload.class, new VoiceSocketPayloadDeserializer());
 		objectMapper.registerModule(simpleModule);
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		return objectMapper;

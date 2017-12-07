@@ -2,7 +2,7 @@ package nl.imine.discord.logic;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class User {
+public class Member {
 
 	private String id;
 	private String username;
@@ -14,10 +14,10 @@ public class User {
 	private boolean verified;
 	private String email;
 
-	public User() {
+	public Member() {
 	}
 
-	public User(String id, String username, String discriminator, String avatar, boolean bot, boolean mfaEnabled, boolean verified, String email) {
+	public Member(String id, String username, String discriminator, String avatar, boolean bot, boolean mfaEnabled, boolean verified, String email) {
 		this.id = id;
 		this.username = username;
 		this.discriminator = discriminator;

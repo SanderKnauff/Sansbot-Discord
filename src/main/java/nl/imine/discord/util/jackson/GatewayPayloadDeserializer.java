@@ -5,12 +5,11 @@ import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import nl.imine.discord.Sansbot;
 import nl.imine.discord.event.Event;
 import nl.imine.discord.event.gateway.EventType;
 import nl.imine.discord.gateway.messages.EventMessage;
+import nl.imine.discord.gateway.messages.GatewayOpcode;
 import nl.imine.discord.gateway.messages.GatewayPayload;
-import nl.imine.discord.gateway.messages.Opcode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,14 +28,14 @@ public class GatewayPayloadDeserializer extends StdDeserializer<GatewayPayload> 
         ObjectCodec codec = jsonParser.getCodec();
         JsonNode jsonNode = codec.readTree(jsonParser);
         deserializationContext.setAttribute("t", jsonNode.get("t").asText());
-        Opcode opcode = null;
-        for (Opcode code : Opcode.values()) {
+        GatewayOpcode gatewayOpcode = null;
+        for (GatewayOpcode code : GatewayOpcode.values()) {
             if (code.getCode() == jsonNode.get("op").asInt()) {
-                opcode = code;
+                gatewayOpcode = code;
             }
         }
         logger.info("{}", jsonNode.toString());
-        if (Opcode.EVENT.equals(opcode)) {
+        if (GatewayOpcode.EVENT.equals(gatewayOpcode)) {
             EventType eventType = EventType.getFromName(jsonNode.get("t").asText());
             Event d = null;
             if (eventType != null && eventType.getEventClass() != null) {
@@ -49,6 +48,6 @@ public class GatewayPayloadDeserializer extends StdDeserializer<GatewayPayload> 
         return (GatewayPayload) codec
                 .readValue(
                         jsonNode.traverse(),
-                        opcode.getType());
+                        gatewayOpcode.getType());
     }
 }

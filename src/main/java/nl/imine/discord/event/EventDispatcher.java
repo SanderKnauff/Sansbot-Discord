@@ -33,6 +33,7 @@ public class EventDispatcher {
                             method.invoke(listener, event);
                         } catch (IllegalAccessException | InvocationTargetException e) {
                             logger.warn("Error dispatching event to {}. Reason: ({}: {})", listener.getClass().getSimpleName(), e.getClass().getSimpleName(), e.getMessage());
+                            e.printStackTrace();
                         }
                     }
 

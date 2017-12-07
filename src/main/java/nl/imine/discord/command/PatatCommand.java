@@ -1,15 +1,11 @@
 package nl.imine.discord.command;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import nl.imine.discord.logic.User;
+import nl.imine.discord.logic.Member;
 import nl.imine.discord.model.Message;
 import nl.imine.discord.service.ChannelService;
 import nl.imine.vaccine.annotation.Component;
@@ -39,7 +35,7 @@ public class PatatCommand implements Command {
 	}
 
 	@Override
-	public void handle(User user, Message message) {
+	public void handle(Member member, Message message) {
 		Message reply = new Message();
 //		Path imagePath = Paths.get("WeVliegenErIn.jpg");
 		reply.setContent("PATAT!");

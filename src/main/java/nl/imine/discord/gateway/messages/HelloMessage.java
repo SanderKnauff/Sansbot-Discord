@@ -5,7 +5,7 @@ import nl.imine.discord.gateway.messages.data.HelloMessageData;
 
 public class HelloMessage extends GatewayPayload {
 
-    private static final Opcode opcode = Opcode.HELLO;
+    private static final GatewayOpcode GATEWAY_OPCODE = GatewayOpcode.HELLO;
 
     @JsonProperty("d")
     private HelloMessageData data;
@@ -27,8 +27,8 @@ public class HelloMessage extends GatewayPayload {
     }
 
     @Override
-    public Opcode getOpcode() {
-        return opcode;
+    public GatewayOpcode getOpcode() {
+        return GATEWAY_OPCODE;
     }
 
 }

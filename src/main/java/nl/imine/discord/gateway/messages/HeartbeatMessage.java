@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class HeartbeatMessage extends GatewayPayload {
 
-    private static final Opcode code = Opcode.HEARTBEAT;
+    private static final GatewayOpcode code = GatewayOpcode.HEARTBEAT;
 
     public HeartbeatMessage() {
 
@@ -16,7 +16,7 @@ public class HeartbeatMessage extends GatewayPayload {
     }
 
     @Override
-    public Opcode getOpcode() {
+    public GatewayOpcode getOpcode() {
         return code;
     }
 

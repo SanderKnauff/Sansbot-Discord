@@ -29,7 +29,7 @@ public class HeartbeatTask implements Runnable {
 			try {
 				HeartbeatMessage heartbeatMessage = new HeartbeatMessage(sequence);
 				String message = objectMapper.writeValueAsString(heartbeatMessage);
-				logger.debug("Sending Heartbeat(Opcode {}) to Discord with Sequence number {}", heartbeatMessage.getOpcode(), heartbeatMessage.getSequenceNumber());
+				logger.debug("Sending Heartbeat(GatewayOpcode {}) to Discord with Sequence number {}", heartbeatMessage.getOpcode(), heartbeatMessage.getSequenceNumber());
 				session.getRemote().sendStringByFuture(message);
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();

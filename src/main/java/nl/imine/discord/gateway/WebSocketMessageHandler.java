@@ -38,14 +38,14 @@ public class WebSocketMessageHandler {
     }
 
     public void handleMessage(GatewayPayload payload) {
-        logger.trace("Opcode: {}", payload.getOpcode());
-        Opcode opcode = payload.getOpcode();
-        if (opcode != null) {
+        logger.trace("GatewayOpcode: {}", payload.getOpcode());
+        GatewayOpcode gatewayOpcode = payload.getOpcode();
+        if (gatewayOpcode != null) {
             Integer sequenceNumber = payload.getSequenceNumber();
             if (sequenceNumber != null) {
                 heartbeatTask.setSequence(sequenceNumber);
             }
-            switch (opcode) {
+            switch (gatewayOpcode) {
                 case EVENT:
                     EventMessage eventMessage = (EventMessage) payload;
                     if (eventMessage.getEventType().getEventClass() != null) {
@@ -81,7 +81,7 @@ public class WebSocketMessageHandler {
                     break;
             }
         } else {
-            logger.warn("Received unknown opcode ({})", opcode);
+            logger.warn("Received unknown gatewayOpcode ({})", gatewayOpcode);
         }
     }
 }

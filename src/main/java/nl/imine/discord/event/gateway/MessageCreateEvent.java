@@ -6,12 +6,12 @@ import nl.imine.discord.model.Message;
 
 public class MessageCreateEvent extends Event {
 
+    @JsonProperty("d")
+    private Message message;
+
     public MessageCreateEvent(){
 
     }
-
-    @JsonProperty("d")
-    private Message message;
 
     public MessageCreateEvent(Message message) {
         this.message = message;

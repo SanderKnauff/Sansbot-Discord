@@ -5,7 +5,7 @@ import nl.imine.discord.gateway.messages.data.IdentifyMessageData;
 
 public class IdentifyMessage extends GatewayPayload {
 
-    private static final Opcode opcode = Opcode.IDENTIFY;
+    private static final GatewayOpcode GATEWAY_OPCODE = GatewayOpcode.IDENTIFY;
 
     @JsonProperty("d")
     private IdentifyMessageData identifyMessageData;
@@ -28,7 +28,7 @@ public class IdentifyMessage extends GatewayPayload {
     }
 
     @Override
-    public Opcode getOpcode() {
-        return opcode;
+    public GatewayOpcode getOpcode() {
+        return GATEWAY_OPCODE;
     }
 }

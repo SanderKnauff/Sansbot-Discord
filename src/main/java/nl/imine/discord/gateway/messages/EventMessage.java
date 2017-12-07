@@ -6,7 +6,7 @@ import nl.imine.discord.event.gateway.EventType;
 
 public class EventMessage extends GatewayPayload {
 
-    private static final Opcode code = Opcode.EVENT;
+    private static final GatewayOpcode code = GatewayOpcode.EVENT;
 
     @JsonProperty("t")
     private EventType eventType;
@@ -36,7 +36,7 @@ public class EventMessage extends GatewayPayload {
     }
 
     @Override
-    public Opcode getOpcode() {
+    public GatewayOpcode getOpcode() {
         return code;
     }
 }

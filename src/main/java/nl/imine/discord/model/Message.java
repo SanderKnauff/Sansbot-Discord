@@ -6,7 +6,7 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import nl.imine.discord.logic.User;
+import nl.imine.discord.logic.Member;
 import nl.imine.discord.util.jackson.LocalDateTimeDeserializer;
 import nl.imine.discord.util.jackson.LocalDateTimeSerializer;
 
@@ -15,7 +15,7 @@ public class Message {
 	private String id;
 	@JsonProperty("channel_id")
 	private String channelId;
-	private User author;
+	private Member author;
 	private String content;
 	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
 	@JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -27,7 +27,7 @@ public class Message {
 	private boolean tts;
 	@JsonProperty("mention_everyone")
 	private boolean mentionEveryone;
-	private Set<User> mentions;
+	private Set<Member> mentions;
 	private byte[] file;
 	@JsonProperty("mention_roles")
 	private Set<Role> mentionRoles;
@@ -43,7 +43,7 @@ public class Message {
 	public Message() {
 	}
 
-	public Message(String id, String channelId, User author, String content, LocalDateTime timestamp, LocalDateTime editedTimestamp, boolean tts, boolean mentionEveryone, Set<User> mentions, byte[] file, Set<Role> mentionRoles, Set<Attachment> attachments, Set<Embed> embeds, Set<Reaction> reactions, String nonce, boolean pinned, String webhookId, MessageType type) {
+	public Message(String id, String channelId, Member author, String content, LocalDateTime timestamp, LocalDateTime editedTimestamp, boolean tts, boolean mentionEveryone, Set<Member> mentions, byte[] file, Set<Role> mentionRoles, Set<Attachment> attachments, Set<Embed> embeds, Set<Reaction> reactions, String nonce, boolean pinned, String webhookId, MessageType type) {
 		this.id = id;
 		this.channelId = channelId;
 		this.author = author;
@@ -80,11 +80,11 @@ public class Message {
 		this.channelId = channelId;
 	}
 
-	public User getAuthor() {
+	public Member getAuthor() {
 		return author;
 	}
 
-	public void setAuthor(User author) {
+	public void setAuthor(Member author) {
 		this.author = author;
 	}
 
@@ -128,11 +128,11 @@ public class Message {
 		this.mentionEveryone = mentionEveryone;
 	}
 
-	public Set<User> getMentions() {
+	public Set<Member> getMentions() {
 		return mentions;
 	}
 
-	public void setMentions(Set<User> mentions) {
+	public void setMentions(Set<Member> mentions) {
 		this.mentions = mentions;
 	}
 

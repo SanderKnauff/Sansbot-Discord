@@ -2,7 +2,7 @@ package nl.imine.discord.event.gateway;
 
 public enum EventType {
 
-	GUILD_CREATE(null),
+	GUILD_CREATE(GuildCreatedEvent.class),
 	MESSAGE_CREATE(MessageCreateEvent.class),
 	MESSAGE_DELETE(null),
 	MESSAGE_UPDATE(null),
@@ -10,7 +10,8 @@ public enum EventType {
 	READY(null),
 	TYPING_START(null),
 	PRESENCE_UPDATE(null),
-	VOICE_STATE_UPDATE(null);
+	VOICE_STATE_UPDATE(VoiceStateUpdateEvent.class),
+	VOICE_SERVER_UPDATE(VoiceServerUpdateEvent.class);
 
 	private Class eventClass;
 

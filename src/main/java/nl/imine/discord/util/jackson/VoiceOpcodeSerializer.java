@@ -3,18 +3,18 @@ package nl.imine.discord.util.jackson;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import nl.imine.discord.gateway.messages.GatewayOpcode;
+import nl.imine.discord.voice.socket.VoiceOpcode;
 
 import java.io.IOException;
 
-public class OpcodeSerializer extends StdSerializer<GatewayOpcode> {
+public class VoiceOpcodeSerializer extends StdSerializer<VoiceOpcode> {
 
-    public OpcodeSerializer() {
-        super(GatewayOpcode.class);
+    public VoiceOpcodeSerializer() {
+        super(VoiceOpcode.class);
     }
 
     @Override
-    public void serialize(GatewayOpcode value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+    public void serialize(VoiceOpcode value, JsonGenerator gen, SerializerProvider provider) throws IOException {
         gen.writeNumber(value.getCode());
     }
 }

@@ -15,7 +15,7 @@ public abstract class GatewayPayload {
     }
 
     @JsonProperty("op")
-    public abstract Opcode getOpcode();
+    public abstract GatewayOpcode getOpcode();
 
     public Integer getSequenceNumber() {
         return sequenceNumber;

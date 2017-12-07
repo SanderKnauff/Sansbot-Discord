@@ -2,7 +2,7 @@ package nl.imine.discord.gateway.messages;
 
 public class AckMessage extends GatewayPayload {
 
-    private static final Opcode code = Opcode.ACK;
+    private static final GatewayOpcode code = GatewayOpcode.ACK;
 
     public AckMessage() {
 
@@ -13,7 +13,7 @@ public class AckMessage extends GatewayPayload {
     }
 
     @Override
-    public Opcode getOpcode() {
+    public GatewayOpcode getOpcode() {
         return code;
     }
 }

@@ -5,6 +5,7 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import nl.imine.discord.logic.Member;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +13,6 @@ import nl.imine.discord.event.EventDispatcher;
 import nl.imine.discord.event.EventHandler;
 import nl.imine.discord.event.Listener;
 import nl.imine.discord.event.gateway.MessageCreateEvent;
-import nl.imine.discord.logic.User;
 import nl.imine.discord.model.Message;
 import nl.imine.discord.service.ChannelService;
 import nl.imine.vaccine.annotation.Component;
@@ -43,21 +43,21 @@ public class CommandHandler implements Listener {
 	@EventHandler
 	public void handleMessageCreateEvent(MessageCreateEvent messageCreateEvent) {
 		Message message = messageCreateEvent.getMessage();
-		User user = message.getAuthor();
+		Member member = message.getAuthor();
 
 		if(message.getContent().startsWith(commandPrefix)) {
 			String input = message.getContent().substring(1);
 			for(Command command : commands) {
 				if(command.getTriggers().stream().anyMatch(trigger -> input.split(" ")[0].equalsIgnoreCase(trigger))) {
-					command.handle(user, message);
+					command.handle(member, message);
 					return;
 				}
 			}
 			Message reply = new Message();
-			reply.setContent(String.format("%s, uuhhh... Nee ik denk niet dat ik begrijp wat je van mij wilt...", user.getMention()));
+			reply.setContent(String.format("%s, uuhhh... Nee ik denk niet dat ik begrijp wat je van mij wilt...", member.getMention()));
 			channelService.createMessage(message.getChannelId(), reply);
 			channelService.deleteMessage(message.getChannelId(), message.getId());
-			logger.info("User ({}) attempted to run unknown command: {}", message.getAuthor().getUsername(), message.getContent());
+			logger.info("Member ({}) attempted to run unknown command: {}", message.getAuthor().getUsername(), message.getContent());
 		}
 	}
 

@@ -20,13 +20,16 @@ public class Channel {
 	private String lastMessageId;
 	private int bitrate;
 	private int userLimit;
-	private List<User> recipients;
+	private List<Member> recipients;
 	private String icon;
 	private String ownerId;
 	private String applicationId;
 	private String parentId;
 
-	public Channel(String id, ChannelType type, String guildId, int position, List<Overwrite> overwrites, String name, String topic, boolean nsfw, String lastMessageId, int bitrate, int userLimit, List<User> receipients, String icon, String ownerId, String applicationId, String parentId) {
+	public Channel() {
+	}
+
+	public Channel(String id, ChannelType type, String guildId, int position, List<Overwrite> overwrites, String name, String topic, boolean nsfw, String lastMessageId, int bitrate, int userLimit, List<Member> receipients, String icon, String ownerId, String applicationId, String parentId) {
 		this.id = id;
 		this.type = type;
 		this.guildId = guildId;
@@ -133,11 +136,11 @@ public class Channel {
 		this.userLimit = userLimit;
 	}
 
-	public List<User> getRecipients() {
+	public List<Member> getRecipients() {
 		return recipients;
 	}
 
-	public void setRecipients(List<User> recipients) {
+	public void setRecipients(List<Member> recipients) {
 		this.recipients = recipients;
 	}
 
